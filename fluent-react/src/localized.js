@@ -165,17 +165,14 @@ export default class Localized extends Component {
       return cloneElement(child, localizedProps, messageValue);
     }
 
-    // If the message contains markup, parse it and try to match the children
-    // found in the translation with the props passed to this Localized.
-    const translationNodes = parseMarkup(messageValue);
-    const translatedChildren = translationNodes.map(childNode => {
+    function renderChild(childNode) {
       if (childNode.nodeType === childNode.TEXT_NODE) {
         return childNode.textContent;
       }
 
-      // If the child is not expected just take its textContent.
+      // If the child is not expected just take its children.
       if (!elems.hasOwnProperty(childNode.localName)) {
-        return childNode.textContent;
+        return Array.from(childNode.childNodes).map(renderChild);
       }
 
       const sourceChild = elems[childNode.localName];
@@ -188,12 +185,15 @@ export default class Localized extends Component {
         return sourceChild;
       }
 
-      // TODO Protect contents of elements wrapped in <Localized>
-      // https://github.com/projectfluent/fluent.js/issues/184
-      // TODO  Control localizable attributes on elements passed as props
-      // https://github.com/projectfluent/fluent.js/issues/185
-      return cloneElement(sourceChild, null, childNode.textContent);
-    });
+      const children = Array.from(childNode.childNodes).map(renderChild);
+
+      return cloneElement(sourceChild, null, ...children.flat());
+    }
+
+    // If the message contains markup, parse it and try to match the children
+    // found in the translation with the props passed to this Localized.
+    const translationNodes = parseMarkup(messageValue);
+    const translatedChildren = translationNodes.map(renderChild);
 
     return cloneElement(child, localizedProps, ...translatedChildren);
   }

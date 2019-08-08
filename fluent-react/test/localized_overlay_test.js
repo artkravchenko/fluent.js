@@ -218,7 +218,7 @@ foo = Click <button className="foo">me</button>!
     ));
   });
 
-  test('nested children are ignored', function() {
+  test('nested children are ignored if they are unexpected', function() {
     const bundle = new FluentBundle();
     const l10n = new ReactLocalization([bundle]);
 
@@ -236,6 +236,34 @@ foo = Click <button><em>me</em></button>!
     assert.ok(wrapper.contains(
       <div>
         Click <button onClick={alert}>me</button>!
+      </div>
+    ));
+  });
+
+  test('nested children are processed', function() {
+    const bundle = new FluentBundle();
+    const l10n = new ReactLocalization([bundle]);
+
+    bundle.addResource(new FluentResource(`
+foo = Click <button><em>me</em></button>!
+`));
+
+    const wrapper = shallow(
+      <Localized
+        id="foo"
+        button={<button onClick={alert}></button>}
+        em={<em className="emphasis"></em>}
+      >
+        <div />
+      </Localized>,
+      { context: { l10n, parseMarkup } }
+    );
+
+    assert.ok(wrapper.contains(
+      <div>
+        Click <button onClick={alert}>
+          <em className="emphasis">me</em>
+        </button>!
       </div>
     ));
   });
