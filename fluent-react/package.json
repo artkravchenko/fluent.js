@@ -1,5 +1,5 @@
 {
-  "name": "@fluent/react",
+  "name": "@artkravchenko/fluent-react",
   "description": "Fluent bindings for React",
   "version": "0.10.0",
   "homepage": "https://projectfluent.org",
@@ -22,7 +22,7 @@
   "module": "./src/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/projectfluent/fluent.js.git"
+    "url": "https://github.com/artkravchenko/fluent.js.git"
   },
   "keywords": [
     "localization",
